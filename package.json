@@ -3,6 +3,7 @@
 	"displayName": "Viz FSM Viewer",
 	"description": "A VS Code extension to view fsm-as-promised styled finite state machine via Graphviz lib",
 	"version": "0.0.1",
+	"publisher": "ThankCreate",
 	"engines": {
 		"vscode": "^1.36.0"
 	},
@@ -10,7 +11,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:extension.helloWorld",
+		"onCommand:vizFsmViewer.open"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -18,6 +20,10 @@
 			{
 				"command": "extension.helloWorld",
 				"title": "Hello World"
+			},
+			{
+				"command": "vizFsmViewer.open",
+				"title": "FsmView: Open"
 			}
 		]
 	},
@@ -29,14 +35,22 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
+		"@babel/types": "^7.5.5",
+		"@types/ejs": "^2.6.3",
 		"@types/glob": "^7.1.1",
 		"@types/mocha": "^5.2.6",
-		"@types/node": "^10.12.21",
+		"@types/node": "^10.14.13",
 		"@types/vscode": "^1.36.0",
 		"glob": "^7.1.4",
 		"mocha": "^6.1.4",
-		"typescript": "^3.3.1",
 		"tslint": "^5.12.1",
+		"typescript": "^3.3.1",
 		"vscode-test": "^1.0.0-next.0"
+	},
+	"dependencies": {
+		"@babel/core": "^7.4.3",
+		"@babel/generator": "^7.4.0",
+		"@types/babel__core": "^7.1.2",
+		"ejs": "^2.6.2"
 	}
 }

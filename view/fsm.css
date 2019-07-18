@@ -1,0 +1,64 @@
+:root {
+    --light-foreground-color: black;
+    --dark-foreground-color: whitesmoke;
+    --high-contrast-foreground-color: whitesmoke;
+}
+
+/* High Contrast theme */
+body.vscode-high-contrast .graph text{
+    fill: var(--high-contrast-foreground-color);
+}
+
+body.vscode-high-contrast .graph path{
+    stroke:var(--high-contrast-foreground-color);
+}
+
+body.vscode-high-contrast .graph ellipse{
+    stroke: var(--high-contrast-foreground-color);
+}
+
+body.vscode-high-contrast .graph polygon{
+    stroke: var(--high-contrast-foreground-color);
+    fill: var(--high-contrast-foreground-color);
+}
+
+
+
+/* Light theme */
+body.vscode-light .graph text{
+    fill: var(--light-foreground-color);
+}
+
+body.vscode-light .graph path{
+    stroke:var(--light-foreground-color);
+}
+
+body.vscode-light .graph ellipse{
+    stroke: var(--light-foreground-color);
+}
+
+body.vscode-light .graph polygon{
+    stroke: var(--light-foreground-color);
+    fill: var(--light-foreground-color);
+}
+
+
+
+
+/* Dark theme */
+body.vscode-dark .graph text{
+    fill: var(--dark-foreground-color);
+}
+
+body.vscode-dark .graph path{
+    stroke: var(--dark-foreground-color);
+}
+
+body.vscode-dark .graph ellipse{
+    stroke: var(--dark-foreground-color);
+}
+
+body.vscode-dark .graph polygon{
+    stroke: var(--dark-foreground-color);
+    fill: var(--dark-foreground-color);
+}
