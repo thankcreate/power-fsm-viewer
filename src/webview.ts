@@ -3,9 +3,17 @@ import * as babel from '@babel/core';
 import * as path from 'path';
 import * as fs from 'fs'
 import * as ejs from 'ejs'
+import * as parser from '@babel/parser'
+import traverse from "@babel/traverse";
 
 const generator = require('@babel/generator').default;
+const extract = require('babel-extract-comments');
 
+
+interface ParseResult {
+    fsmNames: string[],
+    content: string,
+}
 
 export function getWebviewContent(context: vscode.ExtensionContext) {
 
@@ -14,50 +22,243 @@ export function getWebviewContent(context: vscode.ExtensionContext) {
     const dirPath = path.dirname(resourcePath);
     let html = fs.readFileSync(resourcePath, 'utf-8');
 
+
+
     html = html.replace(/(<link.+?href="|<script.+?src="|<img.+?src=")(.+?)"/g, (m, $1, $2) => {
         return $1 + vscode.Uri.file(path.resolve(dirPath, $2)).with({ scheme: 'vscode-resource' }).toString() + '"';
     });
 
-    var fsmContent = getFsmContent(context);
+    var parseResult; 
+    var config = {};
+    try {
+        parseResult = getFsmContent(context);    
+        config = getConfig(context);
+    } catch (error) {
+        return error.message;
+    }
+    
 
     var renderData = {
-        name: '123',
-        embededScript: '<script>' + fsmContent +  '</script>'
+        embededScript: getWrappedFsmContent(parseResult, config)
     }
     var ejsRenderedHtml = ejs.render(html, renderData);
-
-
-
-
     return ejsRenderedHtml;
 }
 
-function getFsmContent(context: vscode.ExtensionContext) {
+function getWrappedFsmContent(parseResult: ParseResult, config: any) {
+    let block = `
+    <script>       
+        let targetFsm;         
+        ${parseResult.content}
+        targetFsm = ${parseResult.fsmNames[0]};
+
+        let config;
+        config = ${JSON.stringify(config)};
+    </script>
+    `
+    return block;
+}
+
+
+
+function getCommentedConfigFromComments(comments: any) {
+    if(!comments || comments.length == 0)
+        return undefined;
+    
+    let vars:any[] = [];
+
+    for(let i in comments) {
+        let element = comments[i];
+        let commentValue = element.value;
+        let head = 'viz-fsm-viewer' 
+        let reg = new RegExp("(" + head + "\\s*?:)(.*)");
+        let matchResult = commentValue.match(reg)
+
+        if(matchResult && matchResult[2]) {     
+            let config;
+            try {
+                config = JSON.parse(matchResult[2]);
+                return config;
+            } catch (error) {
+                throw new Error('Config parse failed');
+            }                               
+        }  
+    }
+
+    return undefined;
+}
+
+function getNeedExportVarNames(comments: any) {
+    let names:any[] = [];
+    let config = getCommentedConfigFromComments(comments);    
+
+    if(config && config['vars'] && config['vars'][0]) {
+        return config['vars'];
+    }
+
+    return names;
+}
+
+function getConfig(context: vscode.ExtensionContext) {
     let activeEditor = vscode.window.activeTextEditor;
 
     if (!activeEditor)
-        return "No active editor";
+        throw new Error("No editor opened >_<");
 
     let activeContent = activeEditor.document.getText();
-    // 
 
+    let comments = extract(activeContent);
+    
+    let config = {};
+    if(comments && comments.length > 0) {
+        config = getCommentedConfigFromComments(comments);  
+    }
+    return config;
+}
+
+
+function getFsmContent(context: vscode.ExtensionContext) : ParseResult {
+    let activeEditor = vscode.window.activeTextEditor;
+
+    if (!activeEditor)
+        throw new Error("No editor opened >_<");
+
+    let activeContent = activeEditor.document.getText();
+
+    let reg = /^\s*(\/\*|[\/]{2})\s*viz-fsm-viewer-reference.*$/mg;    
+    activeContent = activeContent.replace(reg, (m, $1) => {
+        return ';' + m;
+    });    
+    
     let astResult = babel.transformSync(activeContent, {
         code: false,
         ast: true,
-        cwd: context.extensionPath
+        cwd: context.extensionPath,      
+        plugins: [            
+            '@babel/plugin-proposal-class-properties',
+            "@babel/plugin-transform-typescript"
+        ]
     });
     if (!astResult)
-        return "AST fail";
+        throw new Error("FSM not found >_<");
+        
 
-    let ast = astResult.ast;
+    let ast = astResult.ast; 
+
+    // fsms
+    let fsmRes = getFsms(ast, activeContent, context);
+
+    // combined 
+    // let combinedCode = varsContent + '\n'+ fsmRes.content;
+    let combinedCode = generator(ast).code;
+    
+    if(fsmRes.content.trim() === '')
+        throw new Error("FSM not found >_<");
+
+    let ret:ParseResult = {
+        fsmNames: fsmRes.fsmNames, 
+        content: combinedCode
+    };
+
+    return ret;
+}
+
+function varNamesContain(varnames: any[], key: any) {
+    return varnames.find(e=>{
+        return e === key;
+    }) != undefined;
+
+}
+
+function isNeededExportVarInArray(node: any, varNames: any[]) {
+    return (
+        node && node.type === 'VariableDeclaration'
+        && node.declarations && node.declarations[0]
+        && node.declarations[0].type === 'VariableDeclarator'
+        && node.declarations[0].id && varNamesContain(varNames, node.declarations[0].id.name)
+    )
+}
 
 
-    let targets = traverse(ast, activeContent, context);
 
-    if (!targets)
-        return "Didn't find FSM";
-    else
-        return generator(targets[0]).code;
+function isNeededExportVarByLeadingComments(node: any) {
+    let hasLeadingComment = 
+        node && node.leadingComments && node.leadingComments.length > 0;
+    
+    if(!hasLeadingComment)
+        return false;
+    
+    let patternHead = "viz-fsm-viewer-reference";
+    for(let i in node.leadingComments) {
+        let cm = node.leadingComments[i].value;
+        if(cm.indexOf(patternHead) >= 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function getNeedExportVars(ast: any, code: string, context: vscode.ExtensionContext) {
+    // Don't use the config file any more
+    // Changed to use the leading comment
+    //getNeedExportVarsByConfig()
+
+    return getNeedExportVarsByLeadingComments(ast, code, context);
+}
+
+function getNeedExportVarsByLeadingComments(ast: any, code: string, context: vscode.ExtensionContext) {
+        
+    let varNodes:babel.types.Node[] = [];
+
+    traverse(ast, {
+        enter: path => {
+            const { node, parent } = path;
+            if(isNeededExportVarByLeadingComments(node)) {
+                varNodes.push(node);                
+            }
+        }
+    });
+
+    let ret = '';
+    varNodes.forEach(e=>{     
+        ret += generator(e).code + '\n';
+        // if(e.start && e.end) {
+        //     ret += code.substring(e.start, e.end);
+        // }
+    })
+
+    return ret;
+}
+
+
+function getNeedExportVarsByConfig(ast: any, code: string, context: vscode.ExtensionContext) {
+    let comments = extract(code);
+    let varNames:any[] = [];
+    let varNodes:any[] = [];
+
+    if(comments && comments.length > 0) {
+        varNames = getNeedExportVarNames(comments);
+    }
+
+    if(!varNames || varNames.length == 0)
+        return '';
+
+    babel.traverse(ast, {
+        enter: (path:any) => {
+            const { node, parent } = path;
+            if(isNeededExportVarInArray(node, varNames)) {
+                varNodes.push(node);
+            }
+        }
+    });
+
+    let ret = '';
+    varNodes.forEach(e=>{
+        ret += generator(e).code;;
+    })
+
+    return ret;
 }
 
 function isFsmVariableDeclarator(node: any): boolean {
@@ -95,22 +296,20 @@ function isFsmVariableDeclaration(node: any): boolean {
     )
 }
 
-function traverse(ast: any, code: string, context: vscode.ExtensionContext) {
+function getFsms(ast: any, code: string, context: vscode.ExtensionContext) : ParseResult{
     let targets: any[] = [];
+    let names: string[] = [];
     babel.traverse(ast, {
-        enter: path => {
+        enter: (path:any) => {
             const { node, parent } = path;
             if (isFsmVariableDeclaration(node)) {
                 targets.push(node);
+                names.push((<any>node).declarations[0].id.name);
             }
-
-            // if (isFsmVariableDeclarator(node)) {
-            //     target = (<any>node).init;
-            //     path.stop();
-            // }
         }
     });
 
-    return targets;
+    let ret:ParseResult = {fsmNames: names, content: generator(targets[0]).code};
+    return ret;
 }
 

@@ -17,9 +17,10 @@ function convertFsmToDot(fsm) {
 
 function getHead(fsm) {
     let initialName = fsm.initial;
-    
+    let hasC = hasConfig();
+    let rankdir = !hasC || !config.rankdir ? 'TB' : config.rankdir;
 	let ret = `
-		rankdir=TB;
+		rankdir=${rankdir};
 		bgcolor=transparent;
 	`
 	return ret;
@@ -46,6 +47,9 @@ function getNodes(fsm) {
 	return ret
 }
 
+function showErrorToUser(msg) {
+    $('#error-info').html('>_< ' + msg);
+}
 
 
 function renderFsm(fsm) {
@@ -55,11 +59,20 @@ function renderFsm(fsm) {
 		findSvg[0].remove();
 	}
 
-	let gr = convertFsmToDot(fsm);
-	console.log(gr);
+
+    let dot = ''
+    try {
+        dot = convertFsmToDot(fsm);    
+    } catch (error) {
+        // The error message here is misleading
+        // It will say 'inital' is not found when the fsm object is undefined by a missing external reference
+        showErrorToUser("We found the fsm defination, but it can't be parsed");
+        return;
+    }
+    
 
     let viz = new Viz();
-    viz.renderSVGElement(gr)
+    viz.renderSVGElement(dot)
     .then(function(element) {
         
         document.body.appendChild(element);
@@ -84,11 +97,27 @@ let panConfig =
  }
 
 let panZoom;
+
 $(document).ready(()=>{
-    renderFsm(mainFsm);	
+     
+    if(typeof targetFsm == "undefined") {        
+        showErrorToUser("We found the fsm defination, but it can't be parsed.\nDid you forget to reference the dependency?");
+    }
+    else {
+        renderFsm(targetFsm);	
+    }
 })
+
+function hasConfig() {
+    return typeof config !=  'undefined';
+}
 
 $(window).resize(() =>{
     panZoom.resize();
     panZoom.center();
 })
+
+window.onerror = function(message) {
+    this.console.log(message);
+    this.console.log('name' +　message.name);
+}
