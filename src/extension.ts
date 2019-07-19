@@ -15,19 +15,11 @@ export function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('extension.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World!');
-	});
-
-	context.subscriptions.push(disposable);
-
-
-	let disposablePanel = vscode.commands.registerCommand('vizFsmViewer.open', ()=>{
+	let disposables: any = [];
+	let disposablePanel = vscode.commands.registerCommand('vizFsmViewer.open', () => {
 		let panel = vscode.window.createWebviewPanel(
-			'vizFsmViewer', 'FsmView', 
+			'vizFsmViewer', 'FSM View',
 			vscode.ViewColumn.Two,
 			{
 				enableScripts: true
@@ -35,9 +27,43 @@ export function activate(context: vscode.ExtensionContext) {
 		)
 
 		panel.webview.html = webview.getWebviewContent(context);
+
+
+		vscode.workspace.onDidChangeTextDocument(
+			e => {
+				if (vscode.window.activeTextEditor &&
+					e.document === vscode.window.activeTextEditor.document) {
+					panel.webview.html = webview.getWebviewContent(context);
+				}
+			},
+			null,
+			disposables
+		);
+
+		vscode.window.onDidChangeActiveTextEditor(
+			e => {
+				if (vscode.window.activeTextEditor && e &&
+					e.document === vscode.window.activeTextEditor.document) {
+					panel.webview.html = webview.getWebviewContent(context);
+				}
+			},
+			null,
+			disposables
+		);
+
+		panel.onDidDispose(
+			() => {
+				while (disposables.length) {
+					const item = disposables.pop();
+					if (item) {
+						item.dispose();
+					}
+				}
+			}
+		);
 	});
 	context.subscriptions.push(disposablePanel);
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }

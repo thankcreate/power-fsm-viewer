@@ -11,19 +11,14 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld",
 		"onCommand:vizFsmViewer.open"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"commands": [
-			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
-			},
+		"commands": [		
 			{
 				"command": "vizFsmViewer.open",
-				"title": "FsmView: Open"
+				"title": "FSM View: Open"
 			}
 		]
 	},

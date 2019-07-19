@@ -101,7 +101,7 @@ let panZoom;
 $(document).ready(()=>{
      
     if(typeof targetFsm == "undefined") {        
-        showErrorToUser("We found the fsm defination, but it can't be parsed.\nDid you forget to reference the dependency?");
+        showErrorToUser("We found the fsm defination, but it can't be parsed\n");
     }
     else {
         renderFsm(targetFsm);	
