@@ -46,6 +46,7 @@ interface Attribute {
 interface Info {
     onenter?: string,
     onentered?: string,
+    on?: string,
     onleave?: string,
     comments?: string | string[],
     
@@ -131,13 +132,13 @@ function handleCallback(cb: MyCallback) {
     let remain = '';
 
     // prefix + state
-    let allowedPrefix = ['onentered', 'onenter', 'onleave'];
+    let allowedPrefix = ['onentered', 'onenter', 'onleave', 'on'];
     for(let i in allowedPrefix) {
         let ap = allowedPrefix[i];
         if(cb.key.startsWith(ap)) {
             let rem = cb.key.substring(ap.length);
             if(rem && gStates.has(rem)) {
-               
+                console.log(ap + '  ' + cb.value + ' ahahhahaa');
                 (<any>gStates.get(rem))[ap] = cb.value;
                 return;
             }
@@ -317,18 +318,20 @@ function getCommonNotes(fsm:any) {
     
     gStates.forEach((info, stName, map) =>{
         let label;
-        if(info.onenter || info.onentered || info.onleave || info.comments) {
+        if(info.onenter || info.onentered || info.onleave || info.on || info.comments) {
             let title = stName;
             label = `<<table border="0" cellpadding="0" cellspacing="0"><tr><td>${title}</td></tr>`;
 
             // callbacks
-            if (info.onenter || info.onentered || info.onleave)
+            if (info.onenter || info.onentered || info.onleave || info.on )
                 label += getTableHrLine();
 
             if (info.onenter)
                 label += getTableItem("entry/" + info.onenter);
             if (info.onentered)
                 label += getTableItem("entry/" + info.onentered);
+            if (info.on)
+                label += getTableItem("entry/" + info.on);
             if (info.onleave)
                 label += getTableItem("exit/" + info.onleave);
 

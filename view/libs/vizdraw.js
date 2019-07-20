@@ -88,12 +88,13 @@ function handleCallback(cb) {
     let prefix = '';
     let remain = '';
     // prefix + state
-    let allowedPrefix = ['onentered', 'onenter', 'onleave'];
+    let allowedPrefix = ['onentered', 'onenter', 'onleave', 'on'];
     for (let i in allowedPrefix) {
         let ap = allowedPrefix[i];
         if (cb.key.startsWith(ap)) {
             let rem = cb.key.substring(ap.length);
             if (rem && gStates.has(rem)) {
+                console.log(ap + '  ' + cb.value + ' ahahhahaa');
                 gStates.get(rem)[ap] = cb.value;
                 return;
             }
@@ -243,16 +244,18 @@ function getCommonNotes(fsm) {
     let ret = "";
     gStates.forEach((info, stName, map) => {
         let label;
-        if (info.onenter || info.onentered || info.onleave || info.comments) {
+        if (info.onenter || info.onentered || info.onleave || info.on || info.comments) {
             let title = stName;
             label = `<<table border="0" cellpadding="0" cellspacing="0"><tr><td>${title}</td></tr>`;
             // callbacks
-            if (info.onenter || info.onentered || info.onleave)
+            if (info.onenter || info.onentered || info.onleave || info.on)
                 label += getTableHrLine();
             if (info.onenter)
                 label += getTableItem("entry/" + info.onenter);
             if (info.onentered)
                 label += getTableItem("entry/" + info.onentered);
+            if (info.on)
+                label += getTableItem("entry/" + info.on);
             if (info.onleave)
                 label += getTableItem("exit/" + info.onleave);
             // comments            
@@ -435,6 +438,7 @@ $(window).resize(() => {
     panZoom.resize();
     panZoom.center();
     panZoom.zoom(0.8);
+    trimZoomBtns();
 });
 window.onerror = function (message) {
     this.console.log(message);
