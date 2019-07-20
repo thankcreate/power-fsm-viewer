@@ -10,16 +10,16 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "viz-fsm-viewer" is now active!');
+	console.log('Congratulations, your extension "power-fsm-viewer" is now active!');
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
 
 	let disposables: any = [];
-	let disposablePanel = vscode.commands.registerCommand('vizFsmViewer.open', () => {
+	let disposablePanel = vscode.commands.registerCommand('powerFsmViewer.open', () => {
 		let panel = vscode.window.createWebviewPanel(
-			'vizFsmViewer', 'FSM View',
+			'powerFsmViewer', 'FSM View',
 			vscode.ViewColumn.Two,
 			{
 				enableScripts: true
