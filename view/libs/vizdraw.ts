@@ -190,7 +190,7 @@ function applyObjectProperty(from:any, to:any) {
 }
 
 function convertFsmToDot(fsm:any) {
-    checkTheme();
+    ajudstColorByTheme();
     prepareFsmData(fsm);
 
     applyConfig();
@@ -415,17 +415,35 @@ function showErrorToUser(msg:string) {
     $('#error-info').html('>_<<br/>' + msg);
 }
 
+enum CodeTheme {
+    Dark,
+    Light,
+    HighContrast,
+    Unknown,
+}
 
-
-function checkTheme() {
-    let fgColor = 'whitesmoke';
+function getTheme() : CodeTheme {
     if($('.vscode-dark')[0] ) {
-        fgColor = 'whitesmoke';
+        return CodeTheme.Dark;
     }
     else if($('.vscode-light')[0] ) {
-        fgColor = 'black';
+        return CodeTheme.Light;
     }
     else if($('.vscode-high-contrast')[0] ) {
+        return CodeTheme.HighContrast;
+    }
+}
+
+function ajudstColorByTheme() {
+    let fgColor = 'whitesmoke';
+    let theme = getTheme();
+    if(theme === CodeTheme.Dark) {
+        fgColor = 'whitesmoke';
+    }
+    if(theme === CodeTheme.Light) {
+        fgColor = 'black';
+    }
+    if(theme === CodeTheme.HighContrast) {
         fgColor = 'whitesmoke';
     }
     curConfig.color = fgColor;
@@ -487,8 +505,21 @@ let panConfig =
 
 let panZoom:any;
 
+let lastTheme: CodeTheme = CodeTheme.Unknown;
+function checkIfThemeChange() {
+    setInterval(()=>{
+        let curTheme = getTheme();
+        if(lastTheme != CodeTheme.Unknown && 
+            lastTheme != curTheme) {                
+                renderFsm(targetFsm);
+            }
+            lastTheme = curTheme;
+    }, 250)
+}
+
 $(document).ready(()=>{
-    
+    checkIfThemeChange();
+
     if(typeof targetFsm == "undefined") {        
         showErrorToUser(`We found the fsm defination, but it can't be parsed<br/>
 If you used <b>MemberExpression</b> in the FSM declaration, please use comments like this to wrap your code:<br/>
