@@ -270,13 +270,19 @@ function renderFsm(fsm) {
         document.body.appendChild(element);
         panZoom = svgPanZoom(element, panConfig);
         panZoom.zoom(0.8);
+        trimZoomBtns();
     })
-        .catch(error => {
+        .catch((error) => {
         // Create a new Viz instance (@see Caveats page for more info)
         viz = new Viz();
         // Possibly display the error
         console.error(error);
     });
+}
+function trimZoomBtns() {
+    $('#svg-pan-zoom-zoom-in rect.svg-pan-zoom-control-background').attr('rx', 300);
+    $('#svg-pan-zoom-zoom-out rect.svg-pan-zoom-control-background').attr('rx', 300);
+    $('#svg-pan-zoom-reset-pan-zoom rect.svg-pan-zoom-control-background').attr('rx', 13);
 }
 let panConfig = {
     zoomEnabled: true,

@@ -86,3 +86,9 @@ body.vscode-dark .graph .node polygon{
 body.vscode-dark .graph .node polyline{
     stroke: var(--dark-foreground-color); 
 }
+
+
+/* pan */
+.svg-pan-zoom-control-background rect {
+    fill: transparent;
+}

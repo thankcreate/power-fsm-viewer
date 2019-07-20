@@ -1,11 +1,16 @@
 {
-	"name": "viz-fsm-viewer",
-	"displayName": "Viz FSM Viewer",
-	"description": "A VS Code extension to view fsm-as-promised styled finite state machine via Graphviz lib",
-	"version": "0.0.1",
+	"name": "power-fsm-viewer",
+	"displayName": "Power FSM Viewer",
+	"description": "A Viewer for fsm-as-promised style finite state machine declaration via Graphviz lib",
+	"version": "1.0.0",
 	"publisher": "ThankCreate",
+	"license": "MIT",
 	"engines": {
 		"vscode": "^1.36.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/thankcreate/power-fsm-viewer.git"
 	},
 	"categories": [
 		"Other"

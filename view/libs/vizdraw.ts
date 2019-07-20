@@ -93,10 +93,9 @@ function handleState(state:any) {
     let stName = state.name;
     if(gStates.has(stName)) {
         for(let i in state) {
-            gStates.get(stName)[i] = state[i];
+            (<any>gStates.get(stName))[i] = state[i];
         }
     }
-    
 }
 
 function handleCallback(cb: MyCallback) {
@@ -111,7 +110,7 @@ function handleCallback(cb: MyCallback) {
             let rem = cb.key.substring(ap.length);
             if(rem && gStates.has(rem)) {
                
-                gStates.get(rem)[ap] = cb.value;
+                (<any>gStates.get(rem))[ap] = cb.value;
                 return;
             }
         }
@@ -353,19 +352,26 @@ function renderFsm(fsm:any) {
 
     let viz = new Viz();
     viz.renderSVGElement(dot)
-    .then(function(element) {
+    .then(function(element:any) {
         
         document.body.appendChild(element);
 		panZoom = svgPanZoom(element, panConfig)
-		panZoom.zoom(0.8);
+        panZoom.zoom(0.8);
+        trimZoomBtns();
     })
-    .catch(error => {
+    .catch((error:any)=> {
         // Create a new Viz instance (@see Caveats page for more info)
         viz = new Viz();
 
         // Possibly display the error
         console.error(error);
     });
+}
+
+function trimZoomBtns() {
+    $('#svg-pan-zoom-zoom-in rect.svg-pan-zoom-control-background').attr('rx', 300);
+    $('#svg-pan-zoom-zoom-out rect.svg-pan-zoom-control-background').attr('rx', 300);
+    $('#svg-pan-zoom-reset-pan-zoom rect.svg-pan-zoom-control-background').attr('rx', 13);
 }
 
 let panConfig = 
@@ -376,7 +382,7 @@ let panConfig =
     center: true,    
  }
 
-let panZoom;
+let panZoom:any;
 
 $(document).ready(()=>{
     
