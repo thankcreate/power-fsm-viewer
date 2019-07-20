@@ -5,7 +5,7 @@
 }
 
 /* High Contrast theme */
-body.vscode-high-contrast .graph text{
+/* body.vscode-high-contrast .graph text{
     fill: var(--high-contrast-foreground-color);
 }
 
@@ -29,10 +29,10 @@ body.vscode-high-contrast .graph .node polygon{
 
 body.vscode-high-contrast .graph .node polyline{
     stroke: var(--high-contrast-foreground-color);    
-}
+} */
 
 /* Light theme */
-body.vscode-light .graph text{
+/* body.vscode-light .graph text{
     fill: var(--light-foreground-color);
 }
 
@@ -56,10 +56,10 @@ body.vscode-light .graph .node polygon{
 
 body.vscode-light .graph .node polyline{
     stroke: var(--light-foreground-color);    
-}
+} */
 
 /* Dark theme */
-body.vscode-dark .graph text{
+/* body.vscode-dark .graph text{
     fill: var(--dark-foreground-color);
 }
 
@@ -85,10 +85,10 @@ body.vscode-dark .graph .node polygon{
 
 body.vscode-dark .graph .node polyline{
     stroke: var(--dark-foreground-color); 
-}
+} */
 
 
 /* pan */
-.svg-pan-zoom-control-background rect {
+/* .svg-pan-zoom-control-background rect {
     fill: transparent;
-}
+} */

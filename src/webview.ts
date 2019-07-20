@@ -8,7 +8,40 @@ import traverse from "@babel/traverse";
 
 const generator = require('@babel/generator').default;
 type INode = babel.types.Node;
-type IPath = babel.NodePath<babel.types.Node>
+type IPath = babel.NodePath<babel.types.Node>;
+
+const defaultFsmVarName = 'powerFsmDefaultName';
+
+
+let validProperty = {
+    validTransition: ['events', 'transitions'],
+    validCallback: ['callbacks', 'methods'],
+    validInit: ['initial', 'init'],
+    validFinal: ['final'],
+    validState: ['states'],
+
+    isValid: (prop: string, category?: string[]):boolean => {
+        if(!prop)
+            return false;
+
+        if(category) {
+            return category.includes(prop);
+        }
+
+        for(let i in validProperty) {
+            let coll = (<any>validProperty)[i];
+            if(coll.constructor !== Array)
+                continue;
+            
+            coll = coll as Array<string>;
+            if(coll.includes(prop)) 
+                return true;
+        }
+
+        return false;
+    }
+}
+
 
 interface CallbackInfo {
     key: string,
@@ -18,7 +51,8 @@ interface CallbackInfo {
 interface ParseResult {
     fsmVarName: string,
     code: string,
-    callbacks: CallbackInfo[];
+    callbacks: CallbackInfo[],
+    path: IPath;
 }
 
 export function getWebviewContent(context: vscode.ExtensionContext) {
@@ -34,8 +68,8 @@ export function getWebviewContent(context: vscode.ExtensionContext) {
     let parseResult;
     let config;
     try {
-        parseResult = getFsmContent(context);
-        config = getConfig();        
+        config = getConfig();   
+        parseResult = getFsmContent(context);             
     } catch (error) {
         return error.message;
     }
@@ -83,16 +117,17 @@ function getConfig() {
 
     let obArr = [];
 
-    try {
-        for(let i in output) {
-            let ob = JSON.parse(output[i]);
-            obArr.push(ob);
+    for(let i in output) {
+        let ob ;
+        try {
+            ob = JSON.parse(output[i]);
         }
+        catch (error) {
+            throw new Error('Config parse failed, please use standard JSON. Double quotes.<br/>' + output[i]);        
+        }
+        obArr.push(ob);
     }
-    catch (error) {
-        throw new Error('Config parse failed');        
-    }
-
+    
     if(obArr.length === 0)
         return null;
 
@@ -153,42 +188,97 @@ function getFsmContent(context: vscode.ExtensionContext): ParseResult {
 
     let ast = astResult.ast;
 
-    // Get all FSM nodes
-    let fsmNodes = getFsmNodes(ast, code, context);
-    if (!fsmNodes || fsmNodes.length == 0)
-        throw new Error("FSM not found >_<");
+    // Handle the given FSM Node
+    let fsmNodeResult = parseFsm(ast, code, context);
 
-    // Choose target FSM
-    let targetFsmPath = fsmNodes[0];
-
-    // Handle the given FSM
-    let fsmResult = parseFsm(targetFsmPath);
-
-    // If user define the clamped code zone, use that zone    
+    // If user defined the clamped code zone, use that zone    
     let generatedCode = '';
     if (clampedCode) {
-        generatedCode = generator(ast).code;
+        generatedCode = parseClampedZone(ast, fsmNodeResult);
     }
     // otherwise only generate the FSM VariableDeclaration code
     else {
-        generatedCode = generator(targetFsmPath.node).code;
+        generatedCode = fsmNodeResult.code;
     }
 
-    let ret = fsmResult;
+    let ret = fsmNodeResult;
     ret.code = generatedCode;
 
     return ret;
 }
 
-function parseFsm(fsmPath: IPath): ParseResult {
-    let res: ParseResult = { fsmVarName: "", code: "", callbacks: []};
+/**
+ * If need parseClampedZone, this function always follow behind parseFsm
+ * Hence, the fsm ObjectExpression part is already handled(trimed, parsed)
+ */
+function parseClampedZone(ast: any, prevResult: ParseResult) : string{
+    // If the fsm is delcared by a new StateMachine({fsm}) expression,
+    // change the new expression to a normal object
+    let fsmPath = prevResult.path;
 
-    res.fsmVarName = (<any>fsmPath.node).declarations[0].id.name;
+
+    if(fsmPath.parentPath && fsmPath.parentPath.isNewExpression()) {    
+        if(fsmPath.getStatementParent()) {
+            let statement = fsmPath.getStatementParent();
+
+            let newSt = babel.template.statement.ast(prevResult.code);
+            statement.replaceWith(newSt);
+        }
+    }
+    let c5 = fsmPath.getStatementParent();
+    
+    let c = 1;
+    c++;
+
+    return generator(ast).code;
+}
+
+function getFsmVarName(path: IPath): string {
+    if (!path)
+        throw new Error("FSM not found >_<");
+
+    // If the parent of the ObjectExpression is a VariableDeclarator,
+    // Check if the VariableDeclarator has a id name
+    // var fsm = {events:[]}
+    if (path.parent && path.parentPath.node) {
+        let node = <any>path.parentPath.node;
+        if (node.type && node.type === 'VariableDeclarator'
+            && node.id && node.id.name) {
+            return node.id.name;
+        }
+    }
+
+    // If the ObjectExpression is a new parameter
+    if(path.getStatementParent()) {            
+        let statement = path.getStatementParent();            
+        let id = statement.getBindingIdentifiers();        
+        for(let i in id){
+            return i;
+        }
+    }
+    
+
+    return defaultFsmVarName;
+}
+
+function parseFsm(ast: any, code: string, context: vscode.ExtensionContext): ParseResult {
+    // Find all object expression nodes
+    let fsmNodes = getFsmObjectNodes(ast, code, context);
+    if (!fsmNodes || fsmNodes.length == 0)
+        throw new Error("FSM not found >_<");
+    
+    // Choose target FSM
+    let fsmPath = fsmNodes[0];
+    let res: ParseResult = { fsmVarName: "", code: "", callbacks: [], path: fsmPath};
+
+    // Give it a var name
+    res.fsmVarName = getFsmVarName(fsmPath);
+    
     // parse and remove callback nodes
     babel.traverse(fsmPath.node, {
         enter: path => {
             const { node, parent } = path;
-            if (isCallback(node, path)) {
+            if (isCallbackNode(node, path)) {
                 let callbacks = parseCallbacks(path);
                 res.callbacks = callbacks;
                 path.remove();
@@ -206,7 +296,9 @@ function parseFsm(fsmPath: IPath): ParseResult {
         }
     }, fsmPath.scope, undefined, fsmPath);
 
-    res.code = generator(fsmPath.node).code;
+    let objectCode = generator(fsmPath.node).code;
+    let completeCode = `var ${res.fsmVarName} = ${objectCode}`;
+    res.code = completeCode;
     return res;
 }
 
@@ -264,6 +356,27 @@ function parseSingleCallback(node: any) : CallbackInfo | undefined {
     return ret;
 }
 
+function isFsmObjectExpression(node: any): boolean {
+    if(!node)    
+        return false;
+
+    let foundProperties = node.properties && node.properties.length > 0;
+
+    if (!foundProperties)
+        return false;
+
+  
+    // check if have found node like 'events' or 'transitions'
+    for (let i = 0; i < node.properties.length; i++) {
+        let property = node.properties[i];
+        if (property && property.key
+            && property.key.type === 'Identifier'
+            && validProperty.isValid(property.key.name, validProperty.validTransition))
+            return true;
+    }
+
+    return false;
+}
 
 function isFsmVariableDeclarator(node: any): boolean {
     let fondObjectExpressionInit =
@@ -279,12 +392,13 @@ function isFsmVariableDeclarator(node: any): boolean {
     if (!foundProperties)
         return false;
 
-
+  
+    // check if have found node like 'events' or 'transitions'
     for (let i = 0; i < init.properties.length; i++) {
         let property = init.properties[i];
         if (property && property.key
             && property.key.type === 'Identifier'
-            && property.key.name === 'events')
+            && validProperty.isValid(property.key.name, validProperty.validTransition))
             return true;
     }
 
@@ -299,34 +413,28 @@ function isFsmVariableDeclaration(node: any): boolean {
     )
 }
 
-function isCallback(node: any, path: IPath): boolean {
-    return (path.isObjectProperty && node && node.key && node.key.name === 'callbacks');
+function isCallbackNode(node: any, path: IPath): boolean {    
+    // check if have found node like 'callbacks' or 'methods'
+    return (path.isObjectProperty && node && node.key && validProperty.isValid(node.key.name, validProperty.validCallback));
 }
 
 function isCondition(node: any, path: IPath): boolean {
     return (path.isProperty && node && node.key && node.key.name === 'condition');
 }
 
-function getFsmNodes(ast: any, code: string, context: vscode.ExtensionContext): IPath[] {
-    let targets: IPath[] = [];
+
+function getFsmObjectNodes(ast: any, code: string, context: vscode.ExtensionContext): IPath[] {
+    let targets: Set<IPath> = new Set();
 
     babel.traverse(ast, {
         enter: path => {
             const { node, parent } = path;
-            if (isFsmVariableDeclaration(node)) {
-                targets.push(path);
+            if (isFsmObjectExpression(node)) {
+                targets.add(path);
             }
         }
     });
-    return targets;
 
-    // let fsm0Code = generator(targets[0]).code;
-    // console.log(fsm0Code);
-
-
-
-    // let ret:ParseResult = {fsmNames: names, content: fsm0Code};
-    // return ret;
+    return Array.from(targets);
 }
-
 

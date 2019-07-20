@@ -9,13 +9,28 @@ let curConfig = {
     rankdir: "TB",
     font: 'Arial',
     fontSize: 12,
+
     nodeShape: 'rect',
+    nodeStyle: 'rounded',
+
     arrowHead: 'normal',
+    arrowTail: 'normal',
+    dir:'forward',
+    arrowStyle: 'solid',
+
     initialShape: 'oval',
     finalShape: 'oval',
+
     maxRowLetters: 20,
-    style: 'rounded',
     weight: 1,
+
+    color: 'whitesmoke',
+    fontColor: 'whitesmoke',
+    bgColor: 'transparent',
+
+    nodeDot: '',
+    edgeDot: '',
+    graphDot: '',
 }
 
 interface MyCallback {
@@ -23,7 +38,10 @@ interface MyCallback {
     value: string
 }
 
-let fgColor = 'black'
+interface Attribute {
+    k: string,
+    v: string | number,
+}
 
 interface Info {
     onenter?: string,
@@ -39,7 +57,14 @@ type InfoMap = Map<string,Info>;
 let gStates: InfoMap = new Map();
 let gEvents: InfoMap  = new Map();
 
+function normalisze() {
+    if(targetFsm.init) targetFsm.initial = targetFsm.init;
+    if(targetFsm.methods) targetFsm.callbacks = targetFsm.methods;
+    if(targetFsm.transitions) targetFsm.events = targetFsm.transitions;
+}
+
 function prepareFsmData(fsm:any) {
+    normalisze();
     gStates.clear();
     gEvents.clear();    
 
@@ -89,9 +114,12 @@ function prepareFsmData(fsm:any) {
 }
 
 function handleState(state:any) {
+    if(state.comment) state.comments = state.comment;
     
     let stName = state.name;
-    if(gStates.has(stName)) {
+
+    // Attach all attribute of fsm state to info map
+    if(gStates.has(stName)) {        
         for(let i in state) {
             (<any>gStates.get(stName))[i] = state[i];
         }
@@ -142,16 +170,27 @@ function applyConfig() {
     applyObjectProperty(config, curConfig);
 }
 
+// incase user mistype the caps
+// for ignore the uppercase/lowercase here
 function applyObjectProperty(from:any, to:any) {
+    // from: the config in user's comment
+    // to: the default config defined at the top of this file
+
     if(!from || !to)
         return;
 
     for(let i in from) {
+        for(let j in to) {
+            if(j.toLowerCase() === i.toLowerCase()) {
+                to[j] = from[i];
+            }
+        }
         to[i] = from[i];
     }
 }
 
 function convertFsmToDot(fsm:any) {
+    checkTheme();
     prepareFsmData(fsm);
 
     applyConfig();
@@ -171,49 +210,86 @@ function convertFsmToDot(fsm:any) {
 	return ret;
 }
 
-function getHead(fsm:any) {
-    let hasC = hasConfig();
-    let rankdir = !hasC || !curConfig.rankdir ? 'TB' : config.rankdir;
+function getHead(fsm:any) {   
 	let ret = `
-		rankdir=${rankdir};
-		bgcolor=transparent;
-	`
+		rankdir=${curConfig.rankdir};
+		bgcolor=${curConfig.bgColor};
+    `
+    if(config.graphDot) {
+        for(let i in config.graphDot) {
+            let graphItem = `${i}=${config.graphDot[i]}`;
+            ret += graphItem + '\n';
+        }
+    }
+
 	return ret;
 }
 
-function getEdges(fsm:any) {
-    let ret = `edge [fontname = ${curConfig.font}, color=${fgColor}]
-    `
+function getEdges(fsm:any) {    
+    let ret = '';    
 
+    // Default
+    ret += getItemLine('edge', [
+        {k: 'fontname', v:curConfig.font},
+        {k: 'weight', v:curConfig.weight},
+        {k: 'arrowhead', v:curConfig.arrowHead},
+        {k: 'arrowtail', v:curConfig.arrowTail},
+        {k: 'dir', v:curConfig.dir},
+        {k: 'fontsize', v:curConfig.fontSize},
+        {k: 'fontname', v:curConfig.font},       
+        {k: 'style', v:curConfig.arrowStyle},
+        {k: 'color', v: curConfig.color},
+        {k: 'fontcolor', v: curConfig.fontColor},
+    ], config.edgeDot)
+
+    // Each
 	fsm.events.forEach((e:any) => {
-        let eventName = e.name;
-		ret += (e.from + ' -> ' + e.to + ` [ label="${'  ' + eventName}" ,weight=${curConfig.weight} ,arrowhead=${curConfig.arrowHead}, fontsize=${curConfig.fontSize}, color=${fgColor}, fontcolor=${fgColor} ];\n`);
+        let eventName = `"  ${e.name} "`;
+        let eventPath =` ${e.from} -> ${e.to} `;        
+        ret += getItemLine(eventPath, [
+            {k: 'label', v:eventName},
+            {k: 'arrowhead', v:e.arrowhead || e.arrowHead},
+            {k: 'arrowtail', v:e.arrowtail || e.arrowTail},
+            {k: 'dir', v:e.dir},
+            {k: 'style', v:e.style},
+            {k: 'color', v:e.color},
+            {k: 'fontcolor', v:e.fontColor || e.fontcolor},
+        ], e.dot)
 	});
 	return ret;
 }
+
+
 
 function getNodes(fsm:any) {
     
     let ret = '';
     
+    // Every state has their separate attributes in getCommonNotes()    
+    ret += getItemLine('node', [
+        {k:'shape', v:curConfig.nodeShape},
+        {k:'style', v:curConfig.nodeStyle},
+        {k:'fontname', v:curConfig.font},
+        {k:'fontsize', v:curConfig.fontSize},
+        {k:'color', v: curConfig.color},
+        {k:'fontcolor', v: curConfig.fontColor},
+        {k:'margin', v:0.1},
+    ], curConfig.nodeDot);
+    
     // Initial & Final nodes
     if(fsm.initial) {
-        ret += `
-        ${fsm.initial} [shape = ${curConfig.initialShape}, fontname = ${curConfig.font}, fontsize=${curConfig.fontSize}, margin=0.15]; 
-        `
+        ret += getItemLine(fsm.initial, [
+            {k:'shape', v:curConfig.initialShape},
+            {k:'margin', v:0.15},
+        ]);
     }	 
-    if(fsm.final) {
-        ret += `
-        ${fsm.final} [shape = ${curConfig.finalShape}, fontname = ${curConfig.font}, fontsize=${curConfig.fontSize}, margin=0.15];
-        `
+    if(fsm.final) {       
+        ret += getItemLine(fsm.final, [
+            {k:'shape', v:curConfig.finalShape},
+            {k:'margin', v:0.15},
+        ]);
     }
-    
-    // General nodes, actually this part has no use now
-    // every state has their separate attributes in getCommonNotes()
-    ret += `
-    node [shape = ${curConfig.nodeShape}, fontname = ${curConfig.font}, fontsize=${curConfig.fontSize}, margin=0.15];	    
-    `
-    
+
     // Nodes with callback    
     ret += getCommonNotes(fsm);
     ret += '\n';
@@ -257,7 +333,7 @@ function getCommonNotes(fsm:any) {
                 label += getTableItem("exit/" + info.onleave);
 
 
-            // comments
+            // comments            
             if (info.comments) {
                 label += getTableHrLine();
                 label += getCommentsTablePart(info.comments);
@@ -267,30 +343,41 @@ function getCommonNotes(fsm:any) {
             label += `</table>>`;            
         }
 
-        // label
-        let labelExp = label ? `,label=${label}` : ``;        
-
-        // shape
-        let shape = curConfig.nodeShape;
-        if(isKindOf(stName, fsm.initial))
-            shape = curConfig.initialShape;
-        else if(isKindOf(stName, fsm.final))
-            shape = curConfig.finalShape;
-        if(info.shape) 
-            shape = info.shape;
-
-        // style
-        let style = curConfig.style;
-        if(info.style) 
-            style = info.style;
-
-
-        let nodeItem = `
-            ${stName} [shape = ${shape}, fontname = ${curConfig.font}, fontsize=${curConfig.fontSize}, margin=0.1, style=${style} ${labelExp}]
-            `
+        let nodeItem = getItemLine(stName, [
+            {k:'shape', v:info.shape},
+            {k:'style', v:info.style},
+            {k:'label', v:label},
+            {k:'color', v:(<any>info).color},
+            {k:'fontcolor', v:(<any>info).fontColor || (<any>info).fontcolor},
+        ], (<any>info).dot);
         ret += nodeItem;
     });
     return ret;
+}
+
+
+
+function getItemLine(id: string, attributes: Attribute[], dot?: any) {
+    let attr = '';
+    attributes.forEach(e=>{
+        attr += exp(e.k, e.v);
+    });
+
+    if(dot) {
+        for(let i in dot) {
+            attr += exp(i.toLowerCase(), dot[i]);
+        }
+    }
+
+    let item = `${id} [dummy=0 ${attr}]`;
+    return item + '\n';
+}
+
+function exp(key: string, value: string | number) {
+    if(!key || !value)
+        return ``
+    
+    return `,${key}=${value}`;
 }
 
 function getCommentsTablePart(comments:string | string[]) {
@@ -329,11 +416,27 @@ function showErrorToUser(msg:string) {
 }
 
 
-function renderFsm(fsm:any) {
 
+function checkTheme() {
+    let fgColor = 'whitesmoke';
+    if($('.vscode-dark')[0] ) {
+        fgColor = 'whitesmoke';
+    }
+    else if($('.vscode-light')[0] ) {
+        fgColor = 'black';
+    }
+    else if($('.vscode-high-contrast')[0] ) {
+        fgColor = 'whitesmoke';
+    }
+    curConfig.color = fgColor;
+    curConfig.fontColor = fgColor;
+}
+
+function renderFsm(fsm:any) {
     
 	let findSvg = $('svg');
-	console.log(findSvg);
+    console.log(findSvg);
+    
 	if(findSvg.length > 0) {
 		findSvg[0].remove();
 	}

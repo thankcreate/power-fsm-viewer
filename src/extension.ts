@@ -55,7 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
 			},
 			null,
 			disposables
-		);
+		);		
 
 		panel.onDidDispose(
 			() => {
