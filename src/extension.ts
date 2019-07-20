@@ -19,7 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
 	let disposables: any = [];
 	let disposablePanel = vscode.commands.registerCommand('powerFsmViewer.open', () => {
 		let panel = vscode.window.createWebviewPanel(
-			'powerFsmViewer', 'FSM View',
+			'powerFsmViewer', 'FSM',
 			vscode.ViewColumn.Two,
 			{
 				enableScripts: true
@@ -40,12 +40,16 @@ export function activate(context: vscode.ExtensionContext) {
 			disposables
 		);
 
-		vscode.window.onDidChangeActiveTextEditor(
+		vscode.window.onDidChangeTextEditorSelection(
 			e => {
-				if (vscode.window.activeTextEditor && e &&
-					e.document === vscode.window.activeTextEditor.document) {
+				
+				if (e.textEditor === vscode.window.activeTextEditor) {
 					panel.webview.html = webview.getWebviewContent(context);
-				}
+					console.log('haha');
+				  }
+				  else {
+					  console.log("hehe");
+				  }
 			},
 			null,
 			disposables
