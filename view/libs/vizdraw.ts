@@ -432,6 +432,8 @@ function getTheme() : CodeTheme {
     else if($('.vscode-high-contrast')[0] ) {
         return CodeTheme.HighContrast;
     }
+
+    return CodeTheme.Dark;
 }
 
 function ajudstColorByTheme() {
@@ -548,6 +550,7 @@ $(window).resize(() =>{
     panZoom.resize();
     panZoom.center();
     panZoom.zoom(0.8);
+    trimZoomBtns();
 })
 
 window.onerror = function(message:any) {

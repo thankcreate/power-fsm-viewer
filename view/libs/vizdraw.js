@@ -336,6 +336,7 @@ function getTheme() {
     else if ($('.vscode-high-contrast')[0]) {
         return CodeTheme.HighContrast;
     }
+    return CodeTheme.Dark;
 }
 function ajudstColorByTheme() {
     let fgColor = 'whitesmoke';
