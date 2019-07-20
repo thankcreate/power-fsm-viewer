@@ -40,9 +40,15 @@ export function activate(context: vscode.ExtensionContext) {
 			disposables
 		);
 
+		// Here we use onDidChangeTextEditorSelection instead of onDidChangeActiveTextEditor
+		// This is for the fact the if the active edtior is changed to the FSM View, or an empty editor(newly created),
+		// we still get the onDidChangeActiveTextEditor event
+		// However, if we use onDidChangeTextEditorSelection instead, those problems solved.
+		// I think it's because if an empty file or an webview has no selectable elements,
+		// we won't receive onDidChangeTextEditorSelection event
 		vscode.window.onDidChangeTextEditorSelection(
 			e => {
-
+				
 				if (e.textEditor === vscode.window.activeTextEditor) {
 					panel.webview.html = webview.getWebviewContent(context);
 				}
