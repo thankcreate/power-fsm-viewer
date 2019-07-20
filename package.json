@@ -15,7 +15,7 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"commands": [		
+		"commands": [
 			{
 				"command": "vizFsmViewer.open",
 				"title": "FSM View: Open"
@@ -24,10 +24,14 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
+		"compile": "run-p compile:*",
+		"watch": "run-p watch:*",
 		"pretest": "npm run compile",
-		"test": "node ./out/test/runTest.js"
+		"test": "node ./out/test/runTest.js",
+		"compile:Src": "tsc -p ./",
+		"compile:View": "tsc -p ./tsconfig.view.json",
+		"watch:Src": "tsc -watch -p ./",
+		"watch:View": "tsc -watch -p ./tsconfig.view.json"
 	},
 	"devDependencies": {
 		"@babel/types": "^7.5.5",
@@ -49,7 +53,9 @@
 		"@babel/plugin-proposal-class-properties": "^7.5.5",
 		"@babel/plugin-transform-typescript": "^7.5.5",
 		"@types/babel__core": "^7.1.2",
+		"@types/jquery": "^3.3.30",
 		"babel-extract-comments": "^1.0.0",
-		"ejs": "^2.6.2"
+		"ejs": "^2.6.2",
+		"npm-run-all": "^4.1.5"
 	}
 }

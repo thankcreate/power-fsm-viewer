@@ -17,12 +17,19 @@ body.vscode-high-contrast .graph ellipse{
     stroke: var(--high-contrast-foreground-color);
 }
 
-body.vscode-high-contrast .graph polygon{
+body.vscode-high-contrast .graph .edge polygon{
     stroke: var(--high-contrast-foreground-color);
     fill: var(--high-contrast-foreground-color);
 }
 
+body.vscode-high-contrast .graph .node polygon{
+    stroke: var(--high-contrast-foreground-color);    
+}
 
+
+body.vscode-high-contrast .graph .node polyline{
+    stroke: var(--high-contrast-foreground-color);    
+}
 
 /* Light theme */
 body.vscode-light .graph text{
@@ -37,13 +44,19 @@ body.vscode-light .graph ellipse{
     stroke: var(--light-foreground-color);
 }
 
-body.vscode-light .graph polygon{
+body.vscode-light .graph .edge polygon{
     stroke: var(--light-foreground-color);
     fill: var(--light-foreground-color);
 }
 
 
+body.vscode-light .graph .node polygon{
+    stroke: var(--light-foreground-color);    
+}
 
+body.vscode-light .graph .node polyline{
+    stroke: var(--light-foreground-color);    
+}
 
 /* Dark theme */
 body.vscode-dark .graph text{
@@ -58,7 +71,18 @@ body.vscode-dark .graph ellipse{
     stroke: var(--dark-foreground-color);
 }
 
-body.vscode-dark .graph polygon{
+body.vscode-dark .graph .edge polygon{
     stroke: var(--dark-foreground-color);
     fill: var(--dark-foreground-color);
+}
+
+
+body.vscode-dark .graph .node polygon{
+    stroke: var(--dark-foreground-color); 
+}
+
+
+
+body.vscode-dark .graph .node polyline{
+    stroke: var(--dark-foreground-color); 
 }

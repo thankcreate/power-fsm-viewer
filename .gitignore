@@ -2,3 +2,7 @@ out
 node_modules
 .vscode-test/
 *.vsix
+
+
+view/libs/vizdraw.js
+view/libs/vizdraw.js.map
