@@ -10,7 +10,7 @@ A VS Code extension to view javascript finite state machine via Graphviz lib
 * Callbacks, comments in state.
 * Dark/Light/HighContrast theme support.  
 
-<img src="https://raw.githubusercontent.com/thankcreate/power-fsm-viewer/master/preview/preview-3.png" />
+<img width='800px' src="https://raw.githubusercontent.com/thankcreate/power-fsm-viewer/master/preview/preview-3.png" />
 
 ## Usage
 Press `Ctrl+Shift+P` to open commands view, choose `FSM View: Open`.
