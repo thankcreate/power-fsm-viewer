@@ -51,6 +51,8 @@ The above example used the naming convention of `initial/events/callbacks` from 
 
 ## Advanced Usage
 ```
+// fsm-config: {rankdir: LR}
+
 // fsm-begin  <------!important
 
 var Event = {
@@ -77,6 +79,7 @@ let myFsm = new WhateverFSM({
 
 // fsm-end    <------!important
 ```
+<img src="https://github.com/thankcreate/power-fsm-viewer/blob/master/preview/render-preview-2.png?raw=true" />
 If you used MemberExpression in the FSM declaration, you must use `// fsm-begin` and `// fsm-end` to wrap all related code block.
 The block should be self-contained.
 
