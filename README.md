@@ -17,7 +17,7 @@ Press `Ctrl+Shift+P` to open commands view, choose `FSM View: Open`.
 
 ## Quick Start
 
-<img align="right" width="200pxpx" src="https://github.com/thankcreate/power-fsm-viewer/blob/master/preview/render-preview.png?raw=true" />
+<img align="right" width="200px" src="https://github.com/thankcreate/power-fsm-viewer/blob/master/preview/render-preview.png?raw=true" />
 
 ```
 // fsm-config: {"font" : "Arial"}
