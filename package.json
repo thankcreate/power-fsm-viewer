@@ -2,7 +2,7 @@
 	"name": "power-fsm-viewer",
 	"displayName": "Power FSM Viewer",
 	"description": "A viewer for javascript finite state machine via Graphviz",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"publisher": "ThankCreate",
 	"license": "MIT",
 	"engines": {
