@@ -19,7 +19,7 @@ Press `Ctrl+Shift+P` to open commands view, choose `FSM View: Open`.
 
 <img align="right" width="200px" src="https://github.com/thankcreate/power-fsm-viewer/blob/master/preview/render-preview.png?raw=true" />
 
-```
+```javascript
 // fsm-config: {"font" : "Arial"}
 // fsm-config: {"nodeShape" : "diamond"}
 // fsm-config: {"initialShape" : "component", "finalShape" : "tab"}
@@ -51,7 +51,7 @@ but you can also use `init/transitions/methods` from [javascript-state-machine](
 
 
 ## Advanced Usage
-```
+```typescript
 // fsm-config: {"rankdir": "LR"}
 
 // fsm-begin  <------!important
