@@ -8,7 +8,9 @@ A VS Code extension to view javascript finite state machine via Graphviz lib
 * No need for 3rd-party FSM lib. Just pure FSM declaration can be parsed.
 * MemberExpression, TypeScript Enum, Static Class Property.
 * Callbacks, comments in state.
-* Dark/Light/HighContrast theme support.
+* Dark/Light/HighContrast theme support.  
+
+<img src="https://raw.githubusercontent.com/thankcreate/power-fsm-viewer/master/preview/preview-3.png" />
 
 ## Usage
 Press `Ctrl+Shift+P` to open commands view, choose `FSM View: Open`.
@@ -42,7 +44,7 @@ let myFsm = {
 
 The commented `// fsm-config:{}` lines indicate the file-scoped attributes.  
 The inline attributes like `color` and `style` are state/event-scoped  
-For all the config and inline parameters: [Attributes](https://github.com/thankcreate/power-fsm-viewer/wiki/Attributes)
+For all the config and inline parameters: [Attributes Page](https://github.com/thankcreate/power-fsm-viewer/wiki/Attributes)
 
 The above example used the naming convention of `initial/events/callbacks` from [fsm-as-promised](https://github.com/vstirbu/fsm-as-promised), but you can also use `init/transitions/methods` from [javascript-state-machine](https://github.com/jakesgordon/javascript-state-machine)
 
