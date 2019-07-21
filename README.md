@@ -7,7 +7,7 @@ A VS Code extension to view javascript finite state machine via Graphviz lib
 * Parse both [javascript-state-machine](https://github.com/jakesgordon/javascript-state-machine) && [fsm-as-promised](https://github.com/vstirbu/fsm-as-promised) style FSM declaration
 * No need for 3rd-party FSM lib. Just pure FSM declaration can be parsed.
 * MemberExpression, TypeScript Enum, Static Class Property.
-* Callbacks, Comments in state.
+* Callbacks, comments in state.
 * Dark/Light/HighContrast theme support.
 
 ## Usage

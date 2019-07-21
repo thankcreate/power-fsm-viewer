@@ -1,7 +1,7 @@
 {
 	"name": "power-fsm-viewer",
 	"displayName": "Power FSM Viewer",
-	"description": "A Viewer for fsm-as-promised style finite state machine declaration via Graphviz lib",
+	"description": "A Viewer for javascript finite state machine",
 	"version": "1.0.0",
 	"publisher": "ThankCreate",
 	"license": "MIT",
