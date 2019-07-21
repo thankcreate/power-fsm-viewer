@@ -17,6 +17,8 @@ Press `Ctrl+Shift+P` to open commands view, choose `FSM View: Open`.
 
 ## Quick Start
 
+<img align="right" width="200pxpx" src="https://github.com/thankcreate/power-fsm-viewer/blob/master/preview/render-preview.png?raw=true" />
+
 ```
 // fsm-config: {"font" : "Arial"}
 // fsm-config: {"nodeShape" : "diamond"}
@@ -38,6 +40,8 @@ let myFsm = {
     }
 }
 ```
+
+
 The commented `// fsm-config:{}` lines indicate the file-scoped setting.  
 The inline parameters like `color` and `style` are state/event-scoped  
 For all the config and inline parameters: 
@@ -73,7 +77,7 @@ let myFsm = new WhateverFSM({
 
 // fsm-end    <------!important
 ```
-If you used MemberExpression in the FSM declaration, you must use `// fsm-begin` and `// fsm-end` to wrap all related the code block.
+If you used MemberExpression in the FSM declaration, you must use `// fsm-begin` and `// fsm-end` to wrap all related code block.
 The block should be self-contained.
 
 ## Credits
