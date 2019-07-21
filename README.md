@@ -4,7 +4,7 @@ A VS Code extension to view javascript finite state machine via Graphviz lib
 
 ## Features
 * 100% customizable [attributes](https://github.com/thankcreate/power-fsm-viewer/wiki/Attributes) for every node/edge/graph: `color`, `style`, `shape`, `font`, `arrow`, `landscape/portrait`, etc.
-* Parse both [javascript-state-machine](https://github.com/jakesgordon/javascript-state-machine) && [fsm-as-promised](https://github.com/vstirbu/fsm-as-promised) style FSM declaration
+* Supports both [javascript-state-machine](https://github.com/jakesgordon/javascript-state-machine) && [fsm-as-promised](https://github.com/vstirbu/fsm-as-promised) style FSM declaration
 * No need for 3rd-party FSM lib. Just pure FSM declaration can be parsed.
 * MemberExpression, TypeScript Enum, Static Class Property.
 * Callbacks, comments in state.
@@ -46,12 +46,13 @@ The commented `// fsm-config:{}` lines indicate the file-scoped attributes.
 The inline attributes like `color` and `style` are state/event-scoped  
 For all the config and inline parameters: [Attributes Page](https://github.com/thankcreate/power-fsm-viewer/wiki/Attributes)
 
-The above example used the naming convention of `initial/events/callbacks` from [fsm-as-promised](https://github.com/vstirbu/fsm-as-promised), but you can also use `init/transitions/methods` from [javascript-state-machine](https://github.com/jakesgordon/javascript-state-machine)
+The above example used the naming convention of `initial/events/callbacks` from [fsm-as-promised](https://github.com/vstirbu/fsm-as-promised),  
+but you can also use `init/transitions/methods` from [javascript-state-machine](https://github.com/jakesgordon/javascript-state-machine)
 
 
 ## Advanced Usage
 ```
-// fsm-config: {rankdir: LR}
+// fsm-config: {"rankdir": "LR"}
 
 // fsm-begin  <------!important
 
@@ -88,7 +89,7 @@ The block should be self-contained.
 [viz.js](https://github.com/mdaines/viz.js)  
 [fsm-viewer](https://github.com/vstirbu/fsm-viewer)  
 [babel](https://github.com/babel/babel)
-
+[svg-pan-zoom](https://github.com/ariutta/svg-pan-zoom)
 
 
 
