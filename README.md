@@ -3,7 +3,7 @@
 A VS Code extension to view javascript finite state machine via Graphviz lib
 
 ## Features
-* 100% customizable attributes for every node/edge/graph: `color`, `style`, `shape`, `font`, `arrow`, `landscape/portrait`, etc.
+* 100% customizable [attributes](https://github.com/thankcreate/power-fsm-viewer/wiki/Attributes) for every node/edge/graph: `color`, `style`, `shape`, `font`, `arrow`, `landscape/portrait`, etc.
 * Parse both [javascript-state-machine](https://github.com/jakesgordon/javascript-state-machine) && [fsm-as-promised](https://github.com/vstirbu/fsm-as-promised) style FSM declaration
 * No need for 3rd-party FSM lib. Just pure FSM declaration can be parsed.
 * MemberExpression, TypeScript Enum, Static Class Property.
@@ -40,9 +40,9 @@ let myFsm = {
 ```
 
 
-The commented `// fsm-config:{}` lines indicate the file-scoped setting.  
-The inline parameters like `color` and `style` are state/event-scoped  
-For all the config and inline parameters: 
+The commented `// fsm-config:{}` lines indicate the file-scoped attributes.  
+The inline attributes like `color` and `style` are state/event-scoped  
+For all the config and inline parameters: [Attributes](https://github.com/thankcreate/power-fsm-viewer/wiki/Attributes)
 
 The above example used the naming convention of `initial/events/callbacks` from [fsm-as-promised](https://github.com/vstirbu/fsm-as-promised), but you can also use `init/transitions/methods` from [javascript-state-machine](https://github.com/jakesgordon/javascript-state-machine)
 
@@ -85,9 +85,11 @@ The block should be self-contained.
 [Graphviz](http://www.graphviz.org/)  
 [viz.js](https://github.com/mdaines/viz.js)  
 [fsm-viewer](https://github.com/vstirbu/fsm-viewer)  
+[babel](https://github.com/babel/babel)
 
 
 
 
 
-**Enjoy!**
+**Enjoy!**   
+ThankCreate Studio 2019
