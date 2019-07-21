@@ -366,14 +366,38 @@ function isFsmObjectExpression(node: any): boolean {
         return false;
 
   
+    let eventsNodeName;
+    let eventsNode;
     // check if have found node like 'events' or 'transitions'
     for (let i = 0; i < node.properties.length; i++) {
         let property = node.properties[i];
         if (property && property.key
             && property.key.type === 'Identifier'
-            && validProperty.isValid(property.key.name, validProperty.validTransition))
-            return true;
+            && validProperty.isValid(property.key.name, validProperty.validTransition)){             
+            eventsNodeName = property.key.name;
+            eventsNode = property;
+            break;
+        }
     }
+
+    if(!eventsNodeName)
+        return false;
+
+    let propertyKeys:any[] = [];
+    // check if the first element has 'name', 'from', 'to'
+    if(eventsNode.value && eventsNode.value.type === 'ArrayExpression'
+        && eventsNode.value.elements && eventsNode.value.elements[0]
+        && eventsNode.value.elements[0].properties) {
+        let evProperties = eventsNode.value.elements[0].properties;
+        evProperties.forEach((property:any) => {
+            if(property.key && property.key.name) {
+                propertyKeys.push(property.key.name);
+            }
+        });
+    }
+
+    if(propertyKeys.includes('name') && propertyKeys.includes('from') && propertyKeys.includes('to'))
+        return true;
 
     return false;
 }
