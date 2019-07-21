@@ -10,8 +10,6 @@ A VS Code extension to view javascript finite state machine via Graphviz lib
 * Callbacks, Comments in state.
 * Dark/Light/HighContrast theme support.
 
-
-
 ## Usage
 Press `Ctrl+Shift+P` to open commands view, choose `FSM View: Open`.
 
@@ -79,7 +77,7 @@ let myFsm = new WhateverFSM({
 
 // fsm-end    <------!important
 ```
-<img src="https://github.com/thankcreate/power-fsm-viewer/blob/master/preview/render-preview-2.png?raw=true" />
+<img height="100px" src="https://github.com/thankcreate/power-fsm-viewer/blob/master/preview/render-preview-2.png?raw=true" /> <br/> 
 If you used MemberExpression in the FSM declaration, you must use `// fsm-begin` and `// fsm-end` to wrap all related code block.
 The block should be self-contained.
 
