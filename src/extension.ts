@@ -4,6 +4,9 @@ import * as vscode from 'vscode';
 
 import * as webview from "./webview";
 
+import * as path from 'path';
+
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -25,6 +28,15 @@ export function activate(context: vscode.ExtensionContext) {
 				enableScripts: true
 			}
 		)
+		
+
+		const iconFullPathDark = path.join(context.extensionPath, 'images/favicon-dark.png');
+		const iconFullPathLight = path.join(context.extensionPath, 'images/favicon-light.png');
+		panel.iconPath = {
+			light: vscode.Uri.file(iconFullPathLight),
+			dark: vscode.Uri.file(iconFullPathDark)
+		};
+		
 
 		panel.webview.html = webview.getWebviewContent(context);
 

@@ -81,14 +81,14 @@ let myFsm = new WhateverFSM({
 // fsm-end    <------!important
 ```
 <img height="100px" src="https://github.com/thankcreate/power-fsm-viewer/blob/master/preview/render-preview-2.png?raw=true" /> <br/> 
-If you used MemberExpression in the FSM declaration, you must use `// fsm-begin` and `// fsm-end` to wrap all related code block.
+If you used MemberExpression in the FSM declaration, you need to use `// fsm-begin` and `// fsm-end` to wrap all related code block.
 The block should be self-contained.
 
 ## Credits
 [Graphviz](http://www.graphviz.org/)  
 [viz.js](https://github.com/mdaines/viz.js)  
 [fsm-viewer](https://github.com/vstirbu/fsm-viewer)  
-[babel](https://github.com/babel/babel)
+[babel](https://github.com/babel/babel)  
 [svg-pan-zoom](https://github.com/ariutta/svg-pan-zoom)
 
 
