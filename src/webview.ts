@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import * as babel from '@babel/core';
 import * as path from 'path';
-import * as fs from 'fs'
-import * as ejs from 'ejs'
-import * as parser from '@babel/parser'
+import * as fs from 'fs';
+import * as ejs from 'ejs';
+import * as parser from '@babel/parser';
 import traverse from "@babel/traverse";
 
 const generator = require('@babel/generator').default;
@@ -44,14 +44,14 @@ let validProperty = {
 
 
 interface CallbackInfo {
-    key: string,
-    value: string
+    key: string;
+    value: string;
 }
 
 interface ParseResult {
-    fsmVarName: string,
-    code: string,
-    callbacks: CallbackInfo[],
+    fsmVarName: string;
+    code: string;
+    callbacks: CallbackInfo[];
     path: IPath;
 }
 
@@ -137,7 +137,7 @@ function getConfig() {
         for(let i in e) {
             config[i] = e[i];
         }
-    })
+    });
 
     return config;
 }
@@ -216,20 +216,13 @@ function parseClampedZone(ast: any, prevResult: ParseResult) : string{
     // change the new expression to a normal object
     let fsmPath = prevResult.path;
 
+    if(fsmPath.getStatementParent()) {
+        let statement = fsmPath.getStatementParent();
 
-    if(fsmPath.parentPath && fsmPath.parentPath.isNewExpression()) {    
-        if(fsmPath.getStatementParent()) {
-            let statement = fsmPath.getStatementParent();
-
-            let newSt = babel.template.statement.ast(prevResult.code);
-            statement.replaceWith(newSt);
-        }
+        let newSt = babel.template.statement.ast(prevResult.code);
+        statement.replaceWith(newSt);
     }
-    let c5 = fsmPath.getStatementParent();
     
-    let c = 1;
-    c++;
-
     return generator(ast).code;
 }
 
@@ -264,7 +257,7 @@ function getFsmVarName(path: IPath): string {
 function parseFsm(ast: any, code: string, context: vscode.ExtensionContext): ParseResult {
     // Find all object expression nodes
     let fsmNodes = getFsmObjectNodes(ast, code, context);
-    if (!fsmNodes || fsmNodes.length == 0)
+    if (!fsmNodes || fsmNodes.length === 0)
         throw new Error("FSM not found >_<");
     
     // Choose target FSM
@@ -434,7 +427,7 @@ function isFsmVariableDeclaration(node: any): boolean {
         node.type === 'VariableDeclaration'
         && node.declarations && node.declarations[0]
         && isFsmVariableDeclarator(node.declarations[0])
-    )
+    );
 }
 
 function isCallbackNode(node: any, path: IPath): boolean {    

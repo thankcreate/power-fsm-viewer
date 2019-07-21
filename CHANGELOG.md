@@ -1,9 +1,11 @@
 # Change Log
 
-All notable changes to the "viz-fsm-viewer" extension will be documented in this file.
+## 1.0.6 (2019-07-21)
+### Added
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [Unreleased]
-
+- Support for more complex constructors
+- Panel favicon
+- Change log
+## 1.0.0 (2019-07-21)
+### Added
 - Initial release
