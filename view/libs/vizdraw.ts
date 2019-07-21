@@ -7,8 +7,6 @@ declare var svgPanZoom:any;
 // default
 let curConfig = {
     rankdir: "TB",
-    font: 'Arial',
-    fontSize: 12,
 
     nodeShape: 'rect',
     nodeStyle: 'rounded',
@@ -23,6 +21,9 @@ let curConfig = {
 
     maxRowLetters: 20,
     weight: 1,
+
+    font: 'Arial',
+    fontSize: 12,
 
     color: 'whitesmoke',
     fontColor: 'whitesmoke',

@@ -1,58 +1,75 @@
-# viz-fsm-viewer
+# Power FSM Viewer
 
-A VS Code extension to view fsm-as-promised styled finite state machine via Graphviz lib
+A VS Code extension to view javascript finite state machine via Graphviz lib
 
 ## Features
+* Parse both [javascript-state-machine](https://github.com/jakesgordon/javascript-state-machine) && [fsm-as-promised](https://github.com/vstirbu/fsm-as-promised) style FSM declaration
+* No need for 3rd-party FSM lib. Just pure FSM declaration can be parsed.
+* Support MemberExpression, TypeScript Enum, Static Class Property.
+* Callbacks, Comments in state.
+* 100% customizable attributes for every node/edge/graph.
 
 
-## Requirements
+## Usage
+Press `Ctrl+Shift+P` to open commands view, choose `FSM View: Open` command.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## Quick Start
 
-## Extension Settings
+```
+// fsm-config: {"font" : "Arial"}
+// fsm-config: {"nodeShape" : "diamond"}
+// fsm-config: {"initialShape" : "component", "finalShape" : "tab"}
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+let myFsm = {
+    initial: 'home',
+    final: 'end',
+    events: [
+        {name: 'walk', from: 'home', to: 'school', style: 'dotted'},
+        {name: 'run', from: 'school', to: 'end', color: 'green'},
+    ],
+    states: [
+        {name: 'school', color: 'green', comments:"interesting"}
+    ],
+    callbacks: {
+        onhome: ()=>{},
+        onend: function watchTV() {}
+    }
+}
+```
+The commented `// fsm-config:{}` liens indicate the extra default setting.  
+For all the parameters:
 
-For example:
+The above example used the naming convention of `initial/events` from [fsm-as-promised](https://github.com/vstirbu/fsm-as-promised), but you can also use `init/transitions` from [javascript-state-machine](https://github.com/jakesgordon/javascript-state-machine)
 
-This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+## Advanced Usage
+```
+// fsm-begin  <------!important
 
-## Known Issues
+enum Keys {
+    Home = 'Home',
+    Walk = 'Walk',
+    School = 'School',
+}
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+class Style {
+    static Walk = 'dashed'
+}
 
-## Release Notes
+let myFsm = {
+    events: [{
+        name: Keys.Walk, 
+        from: Keys.Home, 
+        to: Keys.School, 
+        style: Style.Walk,
+    }]
+}
 
-Users appreciate release notes as you update your extension.
+// fsm-end    <------!important
+```
 
-### 1.0.0
 
-Initial release of ...
 
-### 1.0.1
 
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
 **Enjoy!**

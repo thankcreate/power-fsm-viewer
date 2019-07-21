@@ -2,8 +2,6 @@
 // default
 let curConfig = {
     rankdir: "TB",
-    font: 'Arial',
-    fontSize: 12,
     nodeShape: 'rect',
     nodeStyle: 'rounded',
     arrowHead: 'normal',
@@ -14,6 +12,8 @@ let curConfig = {
     finalShape: 'oval',
     maxRowLetters: 20,
     weight: 1,
+    font: 'Arial',
+    fontSize: 12,
     color: 'whitesmoke',
     fontColor: 'whitesmoke',
     bgColor: 'transparent',
